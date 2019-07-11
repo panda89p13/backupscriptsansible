@@ -1,0 +1,35 @@
+---
+- name: Run UCS Archive on F5 BIG-IPs
+  hosts: All
+  connection: local
+  gather_facts: False
+
+  vars:
+    f5Provider:
+      server: "{{ mgmtAddr }}"
+      server_port: 443
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: no
+      transport: rest
+ 
+
+  tasks:
+    - name: Set archive name postfix data/time
+      local_action: command date +%Y%m%d-%H%M%Z
+      run_once: true
+      register: date
+
+    - name: Create UCS archive
+      bigip_command:
+        commands:
+          - save sys ucs {{ inventory_hostname }}-{{ date['stdout'] }}
+        provider: "{{f5Provider}}"
+      delegate_to: localhost
+
+    - name: Fetch UCS archive
+      bigip_ucs_fetch:
+        src: "{{ inventory_hostname }}-{{ date['stdout'] }}.ucs"
+        dest: "/<dirlocation>/{{ inventory_hostname }}-{{ date['stdout'] }}.ucs"
+        provider: "{{f5Provider}}"
+      delegate_to: localhost

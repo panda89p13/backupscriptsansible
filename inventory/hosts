@@ -1,0 +1,4 @@
+[All]
+f51.local.com  mgmtAddr=192.168.1.1
+f52.local.com  mgmtAddr=192.168.1.2
+
