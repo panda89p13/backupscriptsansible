@@ -16,20 +16,20 @@
 
   tasks:
     - name: Set archive name postfix data/time
-      local_action: command date +%Y%m%d-%H%M%Z
+      local_action: command date +%Y%m%d-%H%M
       run_once: true
       register: date
 
     - name: Create UCS archive
       bigip_command:
         commands:
-          - save sys ucs {{ inventory_hostname }}-{{ date['stdout'] }}
+          - save sys ucs {{date.stdout}}-{{ inventory_hostname }}
         provider: "{{f5Provider}}"
       delegate_to: localhost
 
     - name: Fetch UCS archive
       bigip_ucs_fetch:
-        src: "{{ inventory_hostname }}-{{ date['stdout'] }}.ucs"
-        dest: "/<dirlocation>/{{ inventory_hostname }}-{{ date['stdout'] }}.ucs"
+        src: "{{date.stdout}}-{{ inventory_hostname }}.ucs"
+        dest: "/<dirlocation>/{{date.stdout}}-{{ inventory_hostname }}.ucs"
         provider: "{{f5Provider}}"
       delegate_to: localhost
